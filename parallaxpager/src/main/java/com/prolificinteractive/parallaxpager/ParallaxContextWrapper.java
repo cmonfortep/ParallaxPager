@@ -22,7 +22,7 @@ public class ParallaxContextWrapper extends ContextWrapper {
         inflater = new ParallaxLayoutInflater(
             LayoutInflater.from(getBaseContext()),
             this,
-            mFactory);
+            mFactory, true);
       }
       return inflater;
     }
