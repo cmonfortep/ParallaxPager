@@ -61,13 +61,6 @@ public class ParallaxContainer extends FrameLayout implements ViewPager.OnPageCh
           "setupChildren should only be called once when ParallaxContainer is empty");
     }
 
-    if (childIds.length == 1) {
-      int id = childIds[0];
-      childIds = new int[2];
-      childIds[0] = id;
-      childIds[1] = id;
-    }
-
     for (int childId : childIds) {
       inflater.inflate(childId, this);
     }
@@ -149,47 +142,54 @@ public class ParallaxContainer extends FrameLayout implements ViewPager.OnPageCh
       pageIndex = pageIndex % pageCount;
     }
 
-    ParallaxViewTag tag;
-    for (View view : parallaxViews) {
-      tag = (ParallaxViewTag) view.getTag(R.id.parallax_view_tag);
-      if (tag == null) { continue; }
-
-      if ((pageIndex == tag.index - 1
-          || (isLooping && (pageIndex == tag.index - 1 + pageCount)))
-          && containerWidth != 0) {
-
-        if (!tag.overrideVisibility) {
-          // make visible
-          view.setVisibility(VISIBLE);
+    if(pageCount > 1) {
+      ParallaxViewTag tag;
+      for (View view : parallaxViews) {
+        tag = (ParallaxViewTag) view.getTag(R.id.parallax_view_tag);
+        if (tag == null) {
+          continue;
         }
 
-        // slide in from right
-        view.setTranslationX((containerWidth - offsetPixels) * tag.xIn);
+        if ((pageIndex == tag.index - 1
+                || (isLooping && (pageIndex == tag.index - 1 + pageCount)))
+                && containerWidth != 0) {
 
-        // slide in from top
-        view.setTranslationY(0 - (containerWidth - offsetPixels) * tag.yIn);
+          if (!tag.overrideVisibility) {
+            // make visible
+            view.setVisibility(VISIBLE);
+          }
 
-        // fade in
-        view.setAlpha(1.0f - (containerWidth - offsetPixels) * tag.alphaIn / containerWidth);
-      } else if (pageIndex == tag.index) {
-        if (!tag.overrideVisibility) {
-          // make visible
-          view.setVisibility(VISIBLE);
-        }
+          // slide in from right
+          view.setTranslationX((containerWidth - offsetPixels) * tag.xIn);
 
-        // slide out to left
-        view.setTranslationX(0 - offsetPixels * tag.xOut);
+          // slide in from top
+          view.setTranslationY(0 - (containerWidth - offsetPixels) * tag.yIn);
 
-        // slide out to top
-        view.setTranslationY(0 - offsetPixels * tag.yOut);
+          // fade in
+          view.setAlpha(1.0f - (containerWidth - offsetPixels) * tag.alphaIn / containerWidth);
+        } else if (pageIndex == tag.index) {
+          if (!tag.overrideVisibility) {
+            // make visible
+            view.setVisibility(VISIBLE);
+          }
 
-        // fade out
-        view.setAlpha(1.0f - offsetPixels * tag.alphaOut / containerWidth);
-      } else {
-        if (!tag.overrideVisibility) {
-          view.setVisibility(GONE);
+          // slide out to left
+          view.setTranslationX(0 - offsetPixels * tag.xOut);
+
+          // slide out to top
+          view.setTranslationY(0 - offsetPixels * tag.yOut);
+
+          // fade out
+          view.setAlpha(1.0f - offsetPixels * tag.alphaOut / containerWidth);
+        } else {
+          if (!tag.overrideVisibility) {
+            view.setVisibility(GONE);
+          }
         }
       }
+    } else {
+      View view = parallaxViews.get(0);
+      view.setVisibility(VISIBLE);
     }
 
     if (pageChangeListener != null) {
